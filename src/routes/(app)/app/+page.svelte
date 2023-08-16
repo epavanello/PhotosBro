@@ -51,7 +51,7 @@
 	let theme = '';
 	let prompt = '';
 	let seed = '';
-	let quantity = 1;
+	let quantity = 50;
 	let spoilerOpen: boolean | undefined = undefined;
 
 	async function onUploadSubmit() {
@@ -113,7 +113,12 @@
 			userInfo.in_training = true;
 			const response = await fetch('/api/train', {
 				method: 'POST',
-				body: JSON.stringify({ instance_class: instanceClass }),
+				body: JSON.stringify({
+					instance_class: instanceClass,
+					theme,
+					prompt,
+					quantity
+				}),
 				headers: {
 					'content-type': 'application/json'
 				}
@@ -362,7 +367,9 @@
 			>
 				{$i18n.t('uploadYourPhotos')}
 			</li>
-			<li class="step" class:step-primary={!!userInfo.paid}>{$i18n.t('payment')}</li>
+			<li class="step" class:step-primary={!!userInfo.paid}>
+				{$i18n.t('payment')}
+			</li>
 			<li class="step" class:step-primary={!!userInfo.paid && userInfo.trained}>
 				{$i18n.t('trainTheAI')}
 			</li>
@@ -377,7 +384,8 @@
 			class:collapse-open={spoilerOpen}
 			class:collapse-close={!spoilerOpen}
 			class="collapse collapse-arrow w-full bg-black shadow rounded-lg p-6 flex flex-col items-center gap-4"
-		style="background-color: #191b1c;">
+			style="background-color: #191b1c;"
+		>
 			{#if !userInfo.trained && !userInfo.in_training}
 				<Title
 					class="collapse-title"
@@ -451,7 +459,10 @@
 			</div>
 		</div>
 
-		<div class="w-full bg-black shadow rounded-lg p-6 flex flex-col items-center gap-4" style="background-color: #191b1c;">
+		<div
+			class="w-full bg-black shadow rounded-lg p-6 flex flex-col items-center gap-4"
+			style="background-color: #191b1c;"
+		>
 			<Title class="mb-4">Pay with Stripe</Title>
 			<div class="flex flex-row justify-center w-full">
 				{#if userInfo.paid == null}
@@ -463,57 +474,11 @@
 				{/if}
 			</div>
 		</div>
-		<div class="w-full bg-black shadow rounded-lg p-6 flex flex-col items-center gap-4" style="background-color: #191b1c;">
-			<Title class="mb-4">Train the AI</Title>
-
-			{#if !userInfo.trained && !userInfo.in_training}
-				<div class="form-control w-full max-w-xs">
-					<label class="label" for="instance_class">
-						<span class="label-text">Specify the subject</span>
-					</label>
-					<select class="select select-bordered" id="instance_class" bind:value={instanceClass}>
-						<option disabled selected />
-						<option value="man">Man</option>
-						<option value="woman">Woman</option>
-						<option value="couple">Couple</option>
-						<option value="dog">Dog</option>
-						<option value="cat">Cat</option>
-					</select>
-				</div>
-			{/if}
-
-			<Tooltip
-				message={!userInfo.paid
-					? 'Before being able to train the AI, you must first complete the payment.'
-					: 'Caution: If you continue, you will not be able to upload any more photos.'}
-			>
-				<Button
-					size="small"
-					type="button"
-					on:click={() => train()}
-					disabled={!userInfo.paid ||
-						(photosForTrain && photosForTrain.length == 0) ||
-						userInfo.trained ||
-						userInfo.in_training}
-					animated
-				>
-					{#if userInfo.in_training}
-						In training
-					{:else if userInfo.trained}
-						Trained
-					{:else}
-						Start training
-					{/if}
-				</Button>
-				{#if userInfo.in_training}
-					<p class="italic text-xs mt-2">It can take up to 2 hours to complete the AI training</p>
-				{/if}
-			</Tooltip>
-		</div>
 
 		<div
 			class="w-full bg-black shadow rounded-lg p-6 flex flex-col items-center gap-4 overflow-hidden"
-		style="background-color: #191b1c;">
+			style="background-color: #191b1c;"
+		>
 			<Title>Generate your avatars ({userInfo.counter})</Title>
 			<div class="flex flex-row justify-center gap-4 flex-wrap w-full">
 				{#if generatedPhotosLoading}
@@ -598,6 +563,23 @@
 					<p class="italic text-xs">There are not yet any images present.</p>
 				{/if}
 			</div>
+
+			{#if !userInfo.trained && !userInfo.in_training}
+				<div class="form-control w-full max-w-xs">
+					<label class="label" for="instance_class">
+						<span class="label-text">Specify the subject</span>
+					</label>
+					<select class="select select-bordered" id="instance_class" bind:value={instanceClass}>
+						<option disabled selected />
+						<option value="man">Man</option>
+						<option value="woman">Woman</option>
+						<option value="couple">Couple</option>
+						<option value="dog">Dog</option>
+						<option value="cat">Cat</option>
+					</select>
+				</div>
+			{/if}
+
 			<!-- Move to component -->
 			<Input
 				label="Quantity"
@@ -637,13 +619,43 @@
 				</p>
 			</Input>
 
-			<Button
-				size="small"
-				type="button"
-				on:click={() => prediction()}
-				disabled={!userInfo.paid || !userInfo.trained || generating || userInfo.in_training}
-				animated>Generate</Button
-			>
+			{#if userInfo.trained}
+				<Button
+					size="small"
+					type="button"
+					on:click={() => prediction()}
+					disabled={!userInfo.paid || !userInfo.trained || generating || userInfo.in_training}
+					animated>Generate</Button
+				>
+			{:else}
+				<Tooltip
+					message={!userInfo.paid
+						? 'Before being able to train the AI, you must first complete the payment.'
+						: 'Caution: If you continue, you will not be able to upload any more photos.'}
+				>
+					<Button
+						size="small"
+						type="button"
+						on:click={() => train()}
+						disabled={!userInfo.paid ||
+							(photosForTrain && photosForTrain.length == 0) ||
+							userInfo.trained ||
+							userInfo.in_training}
+						animated
+					>
+						{#if userInfo.in_training}
+							In training
+						{:else if userInfo.trained}
+							Trained
+						{:else}
+							Start training and generate
+						{/if}
+					</Button>
+					{#if userInfo.in_training}
+						<p class="italic text-xs mt-2">It can take up to 2 hours to complete the AI training</p>
+					{/if}
+				</Tooltip>
+			{/if}
 		</div>
 	{/if}
 </div>

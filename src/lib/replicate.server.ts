@@ -19,9 +19,10 @@ async function getClient<T extends object>({
 	experimental?: boolean;
 }) {
 	const response = await fetch(
-		`${experimental
-			? 'https://dreambooth-api-experimental.replicate.com'
-			: 'https://api.replicate.com'
+		`${
+			experimental
+				? 'https://dreambooth-api-experimental.replicate.com'
+				: 'https://api.replicate.com'
 		}${path}`,
 		{
 			...(body ? { body: JSON.stringify(body) } : {}),
@@ -74,7 +75,13 @@ export async function getTrainingStatus(user: User) {
 	});
 }
 
-export async function runTrain(instanceClass: string, user: User) {
+export async function runTrain(
+	instanceClass: string,
+	user: User,
+	theme: string,
+	prompt: string,
+	quantity: number
+) {
 	return await getClient<ReplicateTrainPayload>({
 		path: '/v1/trainings',
 		body: {
@@ -87,7 +94,11 @@ export async function runTrain(instanceClass: string, user: User) {
 				learning_rate: 1e-6
 			},
 			model: `${PRIVATE_REPLICATE_USERNAME}/${user.id}`,
-			webhook_completed: `${PUBLIC_WEBSITE_HOST}/api/webhooks/${user.id}/training_complete`
+			webhook_completed: `${PUBLIC_WEBSITE_HOST}/api/webhooks/${
+				user.id
+			}/training_complete?theme={encodeURIComponent(theme)}&prompt=${encodeURIComponent(
+				prompt
+			)}&quantity={encodeURIComponent(quantity)}`
 		},
 		method: 'POST',
 		experimental: true
