@@ -14,8 +14,12 @@
 	import { onMount } from 'svelte';
 	import watermark from 'watermarkjs';
 	import { i18n } from '$lib/i18n';
+	import { clickoutside } from '@svelte-put/clickoutside';
+
 
 	let userInfo: Database['public']['Tables']['user_info']['Row'] | null = null;
+
+	let themeOpen = false;
 
 	async function updateUserInfo() {
 		userInfo = await getUserInfo();
@@ -591,15 +595,48 @@
 				min={1}
 				max={20}
 			/>
-			<Input
-				label="Choose the style"
-				id="theme"
-				type="select"
-				block
-				containerClass="w-full max-w-xs"
-				bind:value={theme}
-				options={getThemes(instanceClass).map((option) => [option.name, option.name])}
-			/>
+
+			<div class="form-control w-full max-w-xs">
+				<label class="label">
+					<span class="label-text text-inherit">Choose the style</span>
+				</label>
+				<div
+					class="dropdown dropdown-top w-full"
+					class:dropdown-open={themeOpen}
+					use:clickoutside
+					on:clickoutside={() => (themeOpen = false)}
+				>
+					<input
+						bind:value={theme}
+						class="w-full input input-bordered"
+						readonly
+						on:focus={() => {
+							themeOpen = true;
+						}}
+					/>
+					<ul
+						class="dropdown-content max-h-96 w-full overflow-auto p-2 shadow bg-base-100 rounded-box flex flex-col"
+					>
+						{#each getThemes(instanceClass) as { name }}
+							<li
+								class="px-2 py-1 flex flex-row justify-between items-center gap-2 hover:bg-base-200 rounded-md"
+								on:click={() => {
+									theme = name;
+									themeOpen = false;
+								}}
+							>
+								<span>{name}</span>
+								<!-- your theme images here -->
+								<img
+									class="h-24 block"
+									src="https://zphszdxhpylgalzpdorf.supabase.co/storage/v1/object/public/photos-generated/f456fdce-640e-4ec2-8dd3-63854f4ac2d3/nqeeei6ianhmtiplo57bq7nq3y.jpg"
+								/>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+
 			<div class="divider -mb-2">or</div>
 			<Input
 				label="Prompt"
