@@ -37,9 +37,9 @@
 			class="absolute z-10 w-40 aspect-square rotate-12 shadow-md rounded-md"
 		/>
 		<img
-			src="arrow.svg"
+			src="arrow.png"
 			alt="Arrow"
-			class="absolute text-black left-40 -bottom-4 z-20 rotate-[240deg]"
+			class="absolute text-black left-40 -bottom-4 z-20 rotate-[50deg]"
 		/>
 	</div>
 </div>
@@ -80,9 +80,9 @@
 			class="absolute z-10 w-40 aspect-square rotate-12 shadow-md rounded-md"
 		/>
 		<img
-			src="arrow.svg"
+			src="arrow.png"
 			alt="Arrow"
-			class="absolute text-black right-44 bottom-8 z-20 rotate-[60deg]"
+			class="absolute text-white right-44 rotate-[230deg]"
 		/>
 	</div>
 </div>
@@ -97,28 +97,17 @@
 	<div class="relative z-10 -mx-4 group md:w-6/12 md:mx-0 lg:w-5/12">
 		<div aria-hidden="true" class="absolute top-0 w-full h-full rounded-2xl bg-black shadow-xl" style="background-color: #191b1c;" />
 		<div class="relative p-6 space-y-6 lg:p-8">
-			<h3 class="text-3xl font-semibold text-center text-white">100 avatars</h3>
+			<h3 class="text-3xl font-semibold text-center text-white">50 Ai Avatars</h3>
 			<div>
 				<div class="relative flex justify-around items-center">
-					<span class="block text-sm text-gray-300 font-bold line-through">500 INR</span>
+					<span class="block text-3xl text-gray-400 font-bold line-through">500 INR</span>
 					<div class="relative flex justify-around mb-2">
 						<div class="relative flex flex-row items-end gap-1">
-							<span class="text-4xl text-gray-100 font-bold leading-0">399</span>
+							<span class="text-7xl text-gray-100 font-bold leading-0">399</span>
 							<span class="block text-sm text-blue-500 font-bold">INR</span>
 						</div>
 					</div>
-					<Tooltip message="Copy the promo code">
-						<Button
-							size="tiny"
-							startIcon="copy_all"
-							class="text-xs"
-							primary
-							on:click={() => {
-								navigator.clipboard.writeText('LESS40');
-								showInfo('Promo code copied');
-							}}>LESS40</Button
-						>
-					</Tooltip>
+					
 				</div>
 			</div>
 
@@ -184,7 +173,7 @@
 		<div class="stat">
 			<div class="stat-title">Avatars generated</div>
 			<div class="stat-value">2K</div>
-			<div class="stat-desc">Jan 1st - Feb 1st</div>
+			<div class="stat-desc">August 1st - August 10th</div>
 		</div>
 
 		<div class="stat">
@@ -206,7 +195,7 @@
 		Create unique and personalized <TextGradient>Avatars</TextGradient> with AI assistance
 	</h2>
 	<div class="gap-4">
-		<Button type="button" link="/app" animated endIcon="arrow_forward" class="text-black">Start now</Button>
+		<Button type="button" link="/app" animated endIcon="arrow_forward" class="text-white">Start now</Button>
 
 	</div>
 </div>
