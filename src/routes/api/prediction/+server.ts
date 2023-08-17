@@ -2,15 +2,13 @@ import type { RequestHandler } from './$types';
 import { error as svelteError, json } from '@sveltejs/kit';
 import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { supabaseClientAdmin } from '$lib/db.server';
-import { getAdminUserInfo, handleError } from '$lib/db';
+import { getAdminUserInfo, handleError, type UserInfo } from '$lib/db';
 import { getNegativePrompt, getReplacedPrompt } from '$lib/prompts.server';
 import { getPredictionStatus, runPrediction } from '$lib/replicate.server';
 import { getPrompt } from '$lib/themes';
 import type { PostgrestResponse } from '@supabase/supabase-js';
 import { getLimitedQuantity } from '$lib/predictions.server';
-import type { Session } from '@supabase/supabase-js';
 import Replicate from 'replicate';
-import { UserInfo } from '../../../lib/db';
 
 interface GeneratePayload {
 	theme: string | undefined;
@@ -95,7 +93,7 @@ export const GET: RequestHandler = async (event) => {
 	}
 };
 
-export const generatePhotos = (payload: GeneratePayload, userInfo: UserInfo) => {
+export const _generatePhotos = async (payload: GeneratePayload, userInfo: UserInfo) => {
 	let { theme, quantity, prompt, seed } = payload;
 	if (theme) {
 		prompt = getPrompt(theme);
@@ -121,7 +119,7 @@ export const generatePhotos = (payload: GeneratePayload, userInfo: UserInfo) => 
 			throw new Error('Wrong quantity');
 		}
 	}
-	quantity = getLimitedQuantity(quantity);
+	quantity = getLimitedQuantity(quantity || 1);
 	const quantityLimit = 100;
 	if (quantity > quantityLimit - userInfo.counter) {
 		if (quantityLimit - userInfo.counter > 0) {
@@ -139,12 +137,12 @@ export const generatePhotos = (payload: GeneratePayload, userInfo: UserInfo) => 
 				getReplacedPrompt(prompt, userInfo.instance_class),
 				negativePrompt,
 				seed,
-				user
+				userInfo.id
 			).then((predictionResponse) => {
 				console.log('Predict response', predictionResponse);
 				return supabaseClientAdmin.from('predictions').insert({
 					id: predictionResponse.id,
-					user_id: session.user.id,
+					user_id: userInfo.id,
 					status: predictionResponse.status
 				});
 			})
@@ -192,7 +190,7 @@ export const POST: RequestHandler = async (event) => {
 
 		const userInfo = await getAdminUserInfo(session.user.id, supabaseClientAdmin);
 
-		await generatePhotos(
+		await _generatePhotos(
 			{
 				theme,
 				seed,

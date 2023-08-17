@@ -3,13 +3,13 @@ import { error as svelteError, json } from '@sveltejs/kit';
 import type { ReplicateTrainPayload } from '$lib/replicate.server';
 import { getAdminUserInfo, updateAdminUserInfo } from '$lib/db';
 import { supabaseClientAdmin } from '$lib/db.server';
-import { generatePhotos } from '../../../prediction/+server';
+import { _generatePhotos } from '../../../prediction/+server';
 
 export const POST: RequestHandler = async (event) => {
 	try {
-		const theme = event.url.searchParams.get('theme');
-		const prompt = event.url.searchParams.get('prompt');
-		const quantity = event.url.searchParams.get('quantity');
+		const theme = event.url.searchParams.get('theme') || "";
+		const prompt = event.url.searchParams.get('prompt') || "";
+		const quantity = event.url.searchParams.get('quantity') || "";
 		const payload = (await event.request.json()) as ReplicateTrainPayload;
 		const { logs: _, ...rest } = payload;
 		console.log('Payload', rest);
@@ -33,10 +33,10 @@ export const POST: RequestHandler = async (event) => {
 
 		const userInfo = await getAdminUserInfo(userID, supabaseClientAdmin);
 
-		await generatePhotos(
+		await _generatePhotos(
 			{
 				theme,
-				undefined,
+				seed: undefined,
 				prompt,
 				quantity
 			},

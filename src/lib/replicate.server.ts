@@ -136,7 +136,7 @@ export async function runPrediction(
 	prompt: string,
 	negativePrompt: string,
 	seed: string | undefined,
-	user: User
+	userID: string
 ) {
 	return await getClient<ReplicatePredictionPayload>({
 		path: '/v1/predictions',
@@ -147,7 +147,7 @@ export async function runPrediction(
 				...(seed && !isNaN(parseInt(seed)) ? { seed: parseInt(seed) } : {}),
 				disable_safety_check: true
 			},
-			webhook_completed: `${PUBLIC_WEBSITE_HOST}/api/webhooks/${user.id}/prediction_complete`,
+			webhook_completed: `${PUBLIC_WEBSITE_HOST}/api/webhooks/${userID}/prediction_complete`,
 			version
 		},
 		method: 'POST'
