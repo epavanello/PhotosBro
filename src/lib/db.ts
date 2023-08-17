@@ -44,7 +44,9 @@ export function handleErrorAndGetData<TData, TError extends { message: string }>
 	}
 }
 
-export const getUserInfo = async (): Promise<Database['public']['Tables']['user_info']['Row']> => {
+export type UserInfo = Database['public']['Tables']['user_info']['Row'];
+
+export const getUserInfo = async (): Promise<UserInfo> => {
 	const { error, data } = await supabaseClient
 		.from('user_info')
 		.select('*', { count: 'exact' })

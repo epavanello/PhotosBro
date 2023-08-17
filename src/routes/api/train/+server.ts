@@ -55,8 +55,18 @@ export const POST: RequestHandler = async (event) => {
 			throw new Error("Can't train in staging");
 		}
 
-		const body = await event.request.json();
-		const instanceClass: string | undefined = body.instance_class;
+		const {
+			theme,
+			prompt,
+			quantity,
+			instance_class: instanceClass
+		}: {
+			theme: string;
+			prompt: string;
+			quantity: number;
+			instance_class: string | undefined;
+		} = await event.request.json();
+
 		if (!instanceClass) {
 			throw new Error('Subject not selected');
 		}
@@ -87,7 +97,7 @@ export const POST: RequestHandler = async (event) => {
 			);
 		}
 
-		const trainResult = await runTrain(instanceClass, user);
+		const trainResult = await runTrain(instanceClass, user, theme, prompt, quantity);
 		console.log('Train result', trainResult);
 
 		await updateAdminUserInfo(
