@@ -96,9 +96,9 @@ export async function runTrain(
 			model: `${PRIVATE_REPLICATE_USERNAME}/${user.id}`,
 			webhook_completed: `${PUBLIC_WEBSITE_HOST}/api/webhooks/${
 				user.id
-			}/training_complete?theme={encodeURIComponent(theme)}&prompt=${encodeURIComponent(
+			}/training_complete?theme=${encodeURIComponent(theme)}&prompt=${encodeURIComponent(
 				prompt
-			)}&quantity={encodeURIComponent(quantity)}`
+			)}&quantity=${encodeURIComponent(quantity)}`
 		},
 		method: 'POST',
 		experimental: true
